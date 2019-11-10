@@ -1,0 +1,35 @@
+---
+title: "EarthquakeVizR Vignette"
+author: "Aziiz Sutrisno"
+date: "11/10/2019"
+output: rmarkdown::html_vignette
+---
+
+```{r Setup, include = FALSE}
+knitr::opts_chunk$set(# Collapse output blocks
+                      collapse = TRUE,
+                      comment = "#>",
+                      fig.width = 7,
+                      fig.height = 7,
+                      fig.align = "center",
+                      warning = FALSE)
+```
+
+This vignette describes what is the `earthquakeVizR` package and how it should be used.
+
+## Description
+
+The `earthquakeVizR` package bundles a set of functions to get, clean, visualize, and analyze the data from the [NOAA's Significant Earthquake dataset](https://www.ngdc.noaa.gov/nndc/struts/form?t=101650&s=1&d=1).
+
+## Usage
+
+### Tidying the data
+
+#### Obtaining the data
+
+The function `get_earthquake_data` allows you to load a snapshot of the earthquakes' data downloaded on September 10, 2017; on the proviso that you may want to download the latest data from the NOAA's Website, you can use the `download_earthquake_data` function (requires internet access).
+
+```{r}
+
+raw_data <- "signif.txt"
+```
