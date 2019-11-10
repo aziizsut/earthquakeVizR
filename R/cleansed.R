@@ -1,8 +1,7 @@
 # Required Packages -------------------------------------------------------
 library(readr) # Data Wrangling
 library(dplyr)
-
-
+library(rlang)
 # Data Wrangling Section --------------------------------------------------
 #' @title Data Cleansing
 #' @description This function return a dataframw with fixed date and coordinate format
@@ -18,9 +17,9 @@ library(dplyr)
 #`
 eq_clean_data <- function(rawData){
   readr::read_delim(rawData, delim = "\t") %>%
-    dplyr::mutate(dates = lubridate::dmy(paste0(DAY,"-", MONTH,"-", YEAR))) %>%
-    dplyr::mutate(LATITUDE = as.numeric(LATITUDE),
-           LONGITUDE = as.numeric(LONGITUDE))
+    dplyr::mutate(dates = lubridate::dmy(paste0(rlang::.data$DAY,"-", rlang::.data$MONTH,"-", rlang::.data$YEAR))) %>%
+    dplyr::mutate(LATITUDE = as.numeric(rlang::.data$LATITUDE),
+           LONGITUDE = as.numeric(rlang::.data$LONGITUDE))
 }
 
 
@@ -36,8 +35,8 @@ eq_clean_data <- function(rawData){
 eq_location_clean <- function(rawData){
 
   rawData %>%
-  dplyr::mutate(LOCATION_NAME = LOCATION_NAME %>%
-           stringr::str_replace(paste0(COUNTRY, ":"), "") %>%
+  dplyr::mutate(LOCATION_NAME = rlang::.data$LOCATION_NAME %>%
+           stringr::str_replace(paste0(rlang::.data$COUNTRY, ":"), "") %>%
            stringr::str_trim("both") %>%
            stringr::str_to_title())
 
