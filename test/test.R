@@ -7,7 +7,7 @@ test_that("eq_clean_data returns data frame class", {
 })
 
 test_that("eq_clean_data$DATE is Date type", {
-  expect_is(eq_clean_data(fnames)$dates, "Date")
+  expect_is(eq_clean_data(fnames)$DATE, "Date")
 })
 
 test_that("eq_clean_data returns numeric coordinates", {

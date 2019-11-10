@@ -16,21 +16,19 @@ library(rlang)
 # This function merge dates information and change the latitude and longitude to numeric
 #`
 eq_clean_data <- function(rawData){
-  dset <- rawData %>%
-    dplyr::mutate_(
-      year_fix = ~stringr::str_pad(as.character(abs(YEAR)),
-                                   side = "left", pad = "0"),
-      date_paste = ~paste(year_fix, MONTH, DAY, sep = "-"),
-      DATE = ~lubridate::ymd(date_paste, truncated = 2)) %>%
-    dplyr::select_(quote(-year_fix), quote(-date_paste))
 
-  lubridate::year(dset$DATE) <- dset$YEAR
+  data <- readr::read_delim(rawData, delim = "\t")
+
+  dset <- data %>%
+    dplyr::mutate(
+      year_fix = stringr::str_pad(as.character(abs(YEAR)), width = 4,
+                                   side = "left", pad = "0"),
+      date_paste = paste(year_fix, MONTH, DAY, sep = "-"),
+      DATE = lubridate::ymd(date_paste, truncated = 2))
 
   dset <- dset %>%
-    dplyr::mutate(LATITUDE = ~as.numeric(LATITUDE),
-                   LONGITUDE = ~as.numeric(LONGITUDE))
-
-  dset <- eq_location_clean(dset)
+    dplyr::mutate(LATITUDE = as.numeric(LATITUDE),
+                   LONGITUDE = as.numeric(LONGITUDE))
 
   return(dset)
 }
