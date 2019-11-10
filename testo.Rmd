@@ -28,6 +28,6 @@ The \code{eq_clean_data} and \code{eq_location_clean} are used to preprocess the
 ```{r}
 library(earthquakeVizR)
 raw_data <- "signif.txt"
-dset <- earthquake
+dset <- eq_clean_data(raw_data)
 
 ```

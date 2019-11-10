@@ -16,10 +16,23 @@ library(rlang)
 # This function merge dates information and change the latitude and longitude to numeric
 #`
 eq_clean_data <- function(rawData){
-  readr::read_delim(rawData, delim = "\t") %>%
-    dplyr::mutate(dates = lubridate::dmy(paste0(rlang::.data$DAY,"-", rlang::.data$MONTH,"-", rlang::.data$YEAR))) %>%
-    dplyr::mutate(LATITUDE = as.numeric(rlang::.data$LATITUDE),
-           LONGITUDE = as.numeric(rlang::.data$LONGITUDE))
+  dset <- rawData %>%
+    dplyr::mutate_(
+      year_fix = ~stringr::str_pad(as.character(abs(YEAR)),
+                                   side = "left", pad = "0"),
+      date_paste = ~paste(year_fix, MONTH, DAY, sep = "-"),
+      DATE = ~lubridate::ymd(date_paste, truncated = 2)) %>%
+    dplyr::select_(quote(-year_fix), quote(-date_paste))
+
+  lubridate::year(dset$DATE) <- dset$YEAR
+
+  dset <- dset %>%
+    dplyr::mutate_(LATITUDE = ~as.numeric(LATITUDE),
+                   LONGITUDE = ~as.numeric(LONGITUDE))
+
+  dset <- eq_location_clean(dset)
+
+  return(dset)
 }
 
 
@@ -35,7 +48,7 @@ eq_clean_data <- function(rawData){
 eq_location_clean <- function(rawData){
 
   rawData %>%
-  dplyr::mutate(LOCATION_NAME = rlang::.data$LOCATION_NAME %>%
+  dplyr::mutate(LOCATION_NAME = ~LOCATION_NAME %>%
            stringr::str_replace(paste0(rlang::.data$COUNTRY, ":"), "") %>%
            stringr::str_trim("both") %>%
            stringr::str_to_title())
