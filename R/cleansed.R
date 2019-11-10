@@ -27,7 +27,7 @@ eq_clean_data <- function(rawData){
   lubridate::year(dset$DATE) <- dset$YEAR
 
   dset <- dset %>%
-    dplyr::mutate_(LATITUDE = ~as.numeric(LATITUDE),
+    dplyr::mutate(LATITUDE = ~as.numeric(LATITUDE),
                    LONGITUDE = ~as.numeric(LONGITUDE))
 
   dset <- eq_location_clean(dset)
