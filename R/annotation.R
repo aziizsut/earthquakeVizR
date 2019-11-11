@@ -16,7 +16,7 @@
 #' \dontrun{
 #' readr::read_delim("signif.txt", delim = "\t") %>%
 #' eq_clean_data() %>%
-#'   dplyr::filter(COUNTRY == "MEXICO" & lubridate::year(DATE) >= 2000) %>%
+#'   dplyr::filter(COUNTRY == "MEXICO" & lubridate::year(DATE) > 1990) %>%
 #'   eq_map(annot_col = "DATE")
 #' }
 #'

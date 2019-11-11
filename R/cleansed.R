@@ -43,12 +43,11 @@ eq_clean_data <- function(rawData){
 #' eq_location_clean("/data/signif.txt")
 #'}
 # This function cleans out the Location Name character so it only shows the city or locations
-eq_location_clean <- function(rawData){
+eq_location_clean <- function(dataset){
 
-  rawData %>%
-  dplyr::mutate(LOCATION_NAME = ~LOCATION_NAME %>%
-           stringr::str_replace(paste0(rlang::.data$COUNTRY, ":"), "") %>%
-           stringr::str_trim("both") %>%
-           stringr::str_to_title())
+  dataset %>%
+    tidyr::separate(LOCATION_NAME, into = c("country", "locationName"),
+                    sep = ":") %>%
+    dplyr::mutate(LOCATION_NAME = str_to_title(str_trim(locationName)))
 
 }

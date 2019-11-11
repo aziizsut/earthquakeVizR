@@ -1,0 +1,104 @@
+---
+title: "EarthquakeVizR Vignette"
+author: "Aziiz Sutrisno"
+date: "`r Sys.Date()`"
+output: 
+    prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+vignette: >
+  %\VignetteIndexEntry{Overview of the EarthquakeVizR package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r Setup, include = FALSE}
+knitr::opts_chunk$set(# Collapse output blocks
+                      collapse = TRUE,
+                      comment = "#>",
+                      fig.width = 7,
+                      fig.height = 7,
+                      fig.align = "center",
+                      warning = FALSE)
+```
+
+## Description
+
+The `earthquakeVizR` package is a ollection of functions to cleansed and visualize the data from the [NOAA's Significant Earthquake dataset](https://www.ngdc.noaa.gov/nndc/struts/form?t=101650&s=1&d=1).
+
+## Usage
+
+## Package functions
+
+There are five functions in this package:
+
+- `eq_clean_data()`
+- `geom_timeline()`
+- `geom_timeline_label()`
+- `eq_create_label()`
+- `eq_map()`
+
+For the purposes of these examples we will use data from NOAA inside this package.
+
+
+### Tidying the data
+
+The \code{eq_clean_data} and \code{eq_location_clean} are used to preprocess the data obtained from the __NOAA__ 
+Here we use the combination of both functions to produce the tidy dataset
+
+```{r, message=FALSE}
+raw_data <- "signif.txt"
+
+# We use this function to fix the date and coordinates
+dset <- eq_clean_data(raw_data)
+
+# We use this function to fix the location name
+dset_location <- eq_location_clean(dset)
+
+```
+__Example Result of the cleansed location, time, and the coordinates__
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+dset_ex <- dset_location %>% 
+  filter(YEAR == 2010 & !is.na(LOCATION_NAME)) %>%
+  head(n = 10) %>% 
+  select(LOCATION_NAME, DATE, LATITUDE, LONGITUDE)
+
+kable(dset_ex) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+### Visualize earthquake timeline
+
+We will use the following functions to visualize the earthquake timeline. We use `ggplot2` to construct the functions.
+First, we are using `geom_timeline` to plot the `DATE` in X-axis and `COUNTRY` in the Y-axis. Second, we pass on the 
+`TOTAL_DEATHS` and `EQ_PRIMARY` as optional color and size.
+
+We then use `geom_timeline_label` to pass on the `LOCATION_NAME`
+
+Here is an example:
+
+```{r fig.width = 7, fig.height = 4, warning=FALSE, message=FALSE}
+dset_location %>% filter(COUNTRY == "MEXICO", YEAR > 1990) %>%
+     ggplot(aes(x = DATE,
+                y = COUNTRY,
+                color = as.numeric(TOTAL_DEATHS),
+                size = as.numeric(EQ_PRIMARY)
+     )) +
+     geom_timeline() +
+     geom_timeline_label(aes(label = LOCATION_NAME), n_max = 5) +
+     labs(size = "Richter scale", color = "No of deaths")
+```
+
+
+### Using Leaflet to Overlay Earthquake Data on a Map
+
+We use `leaflet` to overlay the earthquakes data on a map. We pass on the dataset to the `eq_map` function, the map is centered around the Country location the we chose. There is an option to pass on the data label by using `eq_create_label()` function. 
+
+```{r fig.width = 9, fig.height = 6}
+dset_location %>%  
+  dplyr::filter(COUNTRY == "MEXICO" & lubridate::year(DATE) >= 2000) %>% 
+  dplyr::mutate(popup_text = eq_create_label(.)) %>% 
+  eq_map(annot_col = "popup_text")
+```
